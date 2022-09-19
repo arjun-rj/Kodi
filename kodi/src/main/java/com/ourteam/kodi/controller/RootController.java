@@ -35,8 +35,17 @@ public class RootController {
 		return Optional.ofNullable(hen).orElse(defaultHen);
 	}
 	
-	@PostMapping("/addhen")
+	@PostMapping("/hen")
 	public Hen addHen(@RequestBody Hen hen) {
 		return service.addHen(hen);
+	}
+
+	@GetMapping("/nearby")
+	public List<Hen> nearByHens() {
+		List<Hen> henList = service.getAllHens();
+		if(henList.size() > 0) {
+			System.out.println(henList.get(0).toString());
+		}
+		return henList;
 	}
 }
