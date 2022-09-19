@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.GeoSpatialIndexType;
+import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
 import org.springframework.data.mongodb.core.index.GeospatialIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -29,7 +31,9 @@ public class Hen {
 	    public Date modifiedAt;
 	    public double views;
 	    public Address address;
-	    public Owner owner;	    
+	    public Owner owner;
+		@GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
+		public double[] locationCord;
 	    
 	public Hen() {
 		super();

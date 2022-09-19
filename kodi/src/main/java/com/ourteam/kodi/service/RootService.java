@@ -12,4 +12,6 @@ public interface RootService {
 	public Hen addHen(Hen hen);
 
 	public Optional<Hen> getHen(String id);
+
+	public List<Hen> getNearByHens();
 }
