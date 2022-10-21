@@ -1,8 +1,14 @@
 package com.ourteam.kodi.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ourteam.kodi.document.Hen;
 import com.ourteam.kodi.exception.RootException;
 import com.ourteam.kodi.service.RootService;
+import static com.mongodb.client.model.Filters.eq;
 
 @RestController
 public class RootController {
@@ -41,11 +48,20 @@ public class RootController {
 	}
 
 	@GetMapping("/nearby")
-	public List<Hen> nearByHens() {
-		List<Hen> henList = service.getAllHens();
-		if(henList.size() > 0) {
-			System.out.println(henList.get(0).toString());
+	public Object nearByHens() {
+		String uri = "mongodb+srv://admin:admin@sync.8nd5l.mongodb.net/test";
+
+		try (MongoClient mongoClient = MongoClients.create(uri)) {
+			MongoDatabase database = mongoClient.getDatabase("test");
+			MongoCollection<Document> collection = database.getCollection("hen");
+			long count = collection.countDocuments();
+			System.out.println(count);
+			Document doc = collection.find().first();
+			if(doc != null) {
+				System.out.println(doc.toJson());
+				return doc.toJson();
+			}
 		}
-		return henList;
+		return new ArrayList<>();
 	}
 }

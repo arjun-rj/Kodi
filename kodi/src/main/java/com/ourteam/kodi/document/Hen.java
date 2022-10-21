@@ -3,19 +3,10 @@ package com.ourteam.kodi.document;
 import java.util.ArrayList;
 import java.util.Date;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.GeoSpatialIndexType;
-import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
-import org.springframework.data.mongodb.core.index.GeospatialIndex;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import lombok.Data;
 
 @Data
-@Document
 public class Hen {
-	
-		@Id
 	    public String _id;
 	    public String nickName;
 	    public String breed;
@@ -32,7 +23,7 @@ public class Hen {
 	    public double views;
 	    public Address address;
 	    public Owner owner;
-		@GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
+
 		public double[] locationCord;
 	    
 	public Hen() {
