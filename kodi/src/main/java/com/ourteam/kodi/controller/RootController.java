@@ -8,7 +8,11 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.geojson.Point;
+import com.mongodb.client.model.geojson.Position;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +25,7 @@ import com.ourteam.kodi.document.Hen;
 import com.ourteam.kodi.exception.RootException;
 import com.ourteam.kodi.service.RootService;
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.near;
 
 @RestController
 public class RootController {
@@ -54,14 +59,21 @@ public class RootController {
 		try (MongoClient mongoClient = MongoClients.create(uri)) {
 			MongoDatabase database = mongoClient.getDatabase("test");
 			MongoCollection<Document> collection = database.getCollection("hen");
+			collection.createIndex(Indexes.geo2dsphere("location.coordinates"));
 			long count = collection.countDocuments();
 			System.out.println(count);
 			Document doc = collection.find().first();
 			if(doc != null) {
 				System.out.println(doc.toJson());
-				return doc.toJson();
 			}
+
+			Point bangalore = new Point(new Position(12.955779, 77.654910 ));
+			Point vijayawada = new Point(new Position(16.523860603109487, 80.61267889350644));
+			Bson query = near("location.coordinates", vijayawada, 10000.0, 0.0);
+			System.out.println("found docs");
+			collection.find(query)
+					.forEach(hen -> System.out.println(hen.toJson()));
 		}
-		return new ArrayList<>();
+		return "got";
 	}
 }
