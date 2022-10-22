@@ -2,6 +2,7 @@ package com.ourteam.kodi.service;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.Updates;
 import com.mongodb.client.model.geojson.Point;
 import com.mongodb.client.model.geojson.Position;
 import com.ourteam.kodi.document.Hen;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -28,6 +30,13 @@ public class HenService {
 
     public Object addHen(Hen hen) {
         return henCollection.insertOne(hen);
+    }
+
+    public Object updateHen(String id) {
+        Bson updates = Updates.combine(
+                Updates.set("weight", 800.0),
+                Updates.set("lastModifiedAt", new Date()));
+        return henCollection.findOneAndUpdate(eq("_id", new ObjectId(id)), updates);
     }
 
     public Object getHenById(String id) {

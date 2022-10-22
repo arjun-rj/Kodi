@@ -17,6 +17,11 @@ public class HenController {
         return henService.addHen(hen);
     }
 
+    @PutMapping()
+    public Object updateHen(@RequestParam String id) {
+        return henService.updateHen(id);
+    }
+
     @GetMapping()
     public Object getHenById(@RequestParam String id) {
         return henService.getHenById(id);
