@@ -11,6 +11,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.geojson.Point;
 import com.mongodb.client.model.geojson.Position;
+import com.ourteam.kodi.service.HenService;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,52 +30,30 @@ import static com.mongodb.client.model.Filters.near;
 
 @RestController
 public class RootController {
-	
+
 	@Autowired
-	RootService service;
-	
+	HenService henService;
+
 	@GetMapping("/getallhens")
 	public List<Hen> getAllHens() {
-		List<Hen> henList = service.getAllHens();
-		System.out.println(henList.get(0).toString());
-		return henList;
+		return null;
 	}
 	
 	@GetMapping("/gethenbyid/{id}")
 	public Optional<Hen> getHen(@RequestParam String id) {
 		Optional<Hen> defaultHen = Optional.empty();
-		Optional<Hen> hen = service.getHen(id);		
-		return Optional.ofNullable(hen).orElse(defaultHen);
+		/*Optional<Hen> hen = service.getHen(id);
+		return Optional.ofNullable(hen).orElse(defaultHen);*/
+		return defaultHen;
 	}
 	
 	@PostMapping("/hen")
 	public Hen addHen(@RequestBody Hen hen) {
-		return service.addHen(hen);
+		return null;
 	}
 
 	@GetMapping("/nearby")
 	public Object nearByHens() {
-		/*String uri = "mongodb+srv://admin:admin@sync.8nd5l.mongodb.net/test";
-
-		try (MongoClient mongoClient = MongoClients.create(uri)) {
-			MongoDatabase database = mongoClient.getDatabase("test");
-			MongoCollection<Document> collection = database.getCollection("hen");
-			collection.createIndex(Indexes.geo2dsphere("location.coordinates"));
-			long count = collection.countDocuments();
-			System.out.println(count);
-			Document doc = collection.find().first();
-			if(doc != null) {
-				System.out.println(doc.toJson());
-			}
-
-			Point bangalore = new Point(new Position(12.955779, 77.654910 ));
-			Point vijayawada = new Point(new Position(16.523860603109487, 80.61267889350644));
-			Bson query = near("location.coordinates", vijayawada, 10000.0, 0.0);
-			System.out.println("found docs");
-			collection.find(query)
-					.forEach(hen -> System.out.println(hen.toJson()));
-		}
-		return "got";*/
-		return service.getNearByHens();
+		return henService.getNearByHens();
 	}
 }
