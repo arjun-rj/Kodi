@@ -54,7 +54,7 @@ public class RootController {
 
 	@GetMapping("/nearby")
 	public Object nearByHens() {
-		String uri = "mongodb+srv://admin:admin@sync.8nd5l.mongodb.net/test";
+		/*String uri = "mongodb+srv://admin:admin@sync.8nd5l.mongodb.net/test";
 
 		try (MongoClient mongoClient = MongoClients.create(uri)) {
 			MongoDatabase database = mongoClient.getDatabase("test");
@@ -74,6 +74,7 @@ public class RootController {
 			collection.find(query)
 					.forEach(hen -> System.out.println(hen.toJson()));
 		}
-		return "got";
+		return "got";*/
+		return service.getNearByHens();
 	}
 }

@@ -4,19 +4,36 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.geojson.Point;
 import com.mongodb.client.model.geojson.Position;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ourteam.kodi.document.Hen;
 import com.ourteam.kodi.repository.RootDAO;
 
-@Service
-public class RootServiceImpl implements RootService {
+import static com.mongodb.client.model.Filters.near;
 
-	/*@Autowired
-	RootDAO dao;*/
-	
+@Service
+public class RootServiceImpl implements RootService, AutoCloseable {
+
+	MongoClient mongoClient;
+	MongoDatabase database;
+	MongoCollection<Document> henCollection;
+
+	public RootServiceImpl() {
+		String uri = "mongodb+srv://admin:admin@sync.8nd5l.mongodb.net/test";
+		mongoClient = MongoClients.create(uri);
+		database = mongoClient.getDatabase("test");
+		henCollection = database.getCollection("hen");
+	}
+
 	@Override
 	public List<Hen> getAllHens() {
 		//return dao.findAll();
@@ -38,13 +55,20 @@ public class RootServiceImpl implements RootService {
 	}
 
 	@Override
-	public List<Hen> getNearByHens() {
-		double longitude = 16.523860603109487;
-		double latitude = 16.523860603109487;
-		//Point point = new Point(longitude, latitude);
-		double distance = 3;
-		//NearQuery nearQuery = NearQuery.near(point, Metrics.KILOMETERS).maxDistance(distance);
-		//return dao.findAll();
-		return new ArrayList<>();
+	public Object getNearByHens() {
+		List<String> hens = new ArrayList<>();
+		Point vijayawada = new Point(new Position(16.523860603109487, 80.61267889350644));
+		Bson query = near("location.coordinates", vijayawada, 10000.0, 0.0);
+		System.out.println("found docs");
+		henCollection.find(query)
+				.forEach(hen -> hens.add(hen.toJson()));
+		return hens;
+	}
+
+	@Override
+	public void close() throws Exception {
+		if(mongoClient != null) {
+			mongoClient.close();
+		}
 	}
 }

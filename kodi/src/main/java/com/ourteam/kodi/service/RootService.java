@@ -13,5 +13,5 @@ public interface RootService {
 
 	public Optional<Hen> getHen(String id);
 
-	public List<Hen> getNearByHens();
+	public Object getNearByHens();
 }
