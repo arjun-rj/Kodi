@@ -7,12 +7,14 @@ import com.mongodb.client.model.geojson.Position;
 import com.ourteam.kodi.document.Hen;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.near;
 
 @Service
@@ -26,6 +28,15 @@ public class HenService {
 
     public Object addHen(Hen hen) {
         return henCollection.insertOne(hen);
+    }
+
+    public Object getHenById(String id) {
+        Hen hen = henCollection.find(eq("_id", new ObjectId(id))).first();
+        if(hen == null) {
+            return "Not found";
+        }
+        System.out.printf("found hen, id: %s, name: %s%n", hen._id, hen.nickName);
+        return hen;
     }
 
     public Object getNearByHens() {
