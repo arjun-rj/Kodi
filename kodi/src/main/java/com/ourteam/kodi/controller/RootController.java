@@ -47,13 +47,8 @@ public class RootController {
 		return defaultHen;
 	}
 	
-	@PostMapping("/hen")
+	@PostMapping("/temp")
 	public Hen addHen(@RequestBody Hen hen) {
 		return null;
-	}
-
-	@GetMapping("/nearby")
-	public Object nearByHens() {
-		return henService.getNearByHens();
 	}
 }
