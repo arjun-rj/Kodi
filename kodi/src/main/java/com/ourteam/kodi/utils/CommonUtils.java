@@ -1,9 +1,7 @@
 package com.ourteam.kodi.utils;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.ourteam.kodi.common.ReturnStatus;
+import io.jsonwebtoken.*;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
@@ -15,12 +13,12 @@ import com.ourteam.kodi.common.Constants;
 
 public class CommonUtils {
 
-    public static String generateUserToken(String userId, String userName, String phone) {
+    public static ReturnStatus<String> generateUserToken(String userId, String userName, String phone) {
         Key hmacKey = new SecretKeySpec(Base64.getDecoder().decode(Constants.JWT_SECRET),
                 SignatureAlgorithm.HS256.getJcaName());
 
         Instant now = Instant.now();
-        return Jwts.builder()
+        String token = Jwts.builder()
                 .claim("name", userName)
                 .claim("phone", phone)
                 .setId(userId)
@@ -28,15 +26,21 @@ public class CommonUtils {
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
                 .signWith(hmacKey)
                 .compact();
+        return new ReturnStatus<>(true, token, null);
     }
 
-    public static Jws<Claims> parseJwt(String jwtString) {
+    public static ReturnStatus<Jws<Claims>> parseJwt(String jwtString) {
         Key hmacKey = new SecretKeySpec(Base64.getDecoder().decode(Constants.JWT_SECRET),
                 SignatureAlgorithm.HS256.getJcaName());
 
-        return Jwts.parserBuilder()
-                .setSigningKey(hmacKey)
-                .build()
-                .parseClaimsJws(jwtString);
+        try {
+            Jws<Claims> jwt = Jwts.parserBuilder()
+                    .setSigningKey(hmacKey)
+                    .build()
+                    .parseClaimsJws(jwtString);
+            return new ReturnStatus<>(true, jwt, null);
+        } catch (ExpiredJwtException ex) {
+            return new ReturnStatus<>(false, null, ex.getMessage());
+        }
     }
 }
