@@ -11,7 +11,7 @@ public class User {
     public ObjectId _id;
     public String name;
     public String phone;
-    public Location userLocation;
+    public Location location;
     public ArrayList<String> myHens;
     public Date signedUpAt;
     public Date lastModifiedAt;
@@ -26,7 +26,7 @@ public class User {
                 "_id=" + _id +
                 ", name='" + name + '\'' +
                 ", phone='" + phone + '\'' +
-                ", userLocation=" + userLocation +
+                ", userLocation=" + location +
                 ", myHens=" + myHens +
                 ", signedUpAt=" + signedUpAt +
                 ", lastModifiedAt=" + lastModifiedAt +

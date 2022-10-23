@@ -24,7 +24,7 @@ public class UserController {
     }
 
     @GetMapping()
-    public Object getUserById(@RequestParam String id) {
-        return userService.getUserById(id);
+    public Object getUserById(@RequestParam String id, @RequestParam String token) {
+        return userService.getUserById(id, token);
     }
 }

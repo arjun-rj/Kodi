@@ -6,6 +6,8 @@ import com.mongodb.client.result.InsertOneResult;
 import com.ourteam.kodi.document.Hen;
 import com.ourteam.kodi.document.User;
 import com.ourteam.kodi.utils.CommonUtils;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
@@ -32,7 +34,7 @@ public class UserService {
         user.setLastModifiedAt(new Date());
         InsertOneResult result = userCollection.insertOne(user);
         System.out.println(result.getInsertedId());
-        return CommonUtils.generateUserToken(result.getInsertedId().toString(), user.name, user.phone);
+        return "User signed up";
     }
 
     public Object loginUser(String phone) {
@@ -42,11 +44,15 @@ public class UserService {
         }
         /*Bson updates = Updates.combine(
                 Updates.set("lastLoginAt", new Date()));*/
-        user.lastLoginAt = new Date();
+        user.lastLoginAt = new Date();  // not working
         return CommonUtils.generateUserToken(user._id.toString(), user.name, user.phone);
     }
 
-    public Object getUserById(String id) {
+    public Object getUserById(String id, String token) {
+        Jws<Claims> decode = CommonUtils.parseJwt(token);
+        System.out.println(decode.getBody().get("phone"));  // user phone
+        System.out.println(decode.getBody().get("jti"));    // user id
+
         User user = userCollection.find(eq("_id", new ObjectId(id))).first();
         if(user == null) {
             return "Not found";
