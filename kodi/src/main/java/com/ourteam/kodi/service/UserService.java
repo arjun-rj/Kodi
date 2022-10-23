@@ -3,6 +3,7 @@ package com.ourteam.kodi.service;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.InsertOneResult;
+import com.ourteam.kodi.common.Constants;
 import com.ourteam.kodi.common.ReturnStatus;
 import com.ourteam.kodi.document.Hen;
 import com.ourteam.kodi.document.User;
@@ -28,22 +29,25 @@ public class UserService {
         this.userCollection = rootService.getUserCollection();
     }
 
-    public Object signUpUser(User user) {
+    public ResponseEntity<Object> signUpUser(User user) {
         User knownUser = userCollection.find(eq("phone", user.phone)).first();
         if(knownUser != null) {
-            return String.format("There is an user already existing with the give phone: %s", user.phone);
+            String message = String.format("There is an user already existing with the give phone: %s", user.phone);
+            return new ResponseEntity<>(message, HttpStatus.FORBIDDEN);
         }
         user.setSignedUpAt(new Date());
         user.setLastModifiedAt(new Date());
         InsertOneResult result = userCollection.insertOne(user);
-        System.out.println(result.getInsertedId());
-        return "User signed up";
+        System.out.println("Created user: "+result.getInsertedId());
+        ReturnStatus<String> status = CommonUtils.generateUserToken(result.getInsertedId().toString(),
+                user.name, user.phone);
+        return new ResponseEntity<>(status, HttpStatus.OK);
     }
 
     public ResponseEntity<Object> loginUser(String phone) {
         User user = userCollection.find(eq("phone", phone)).first();
         if(user == null) {
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(Constants.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
         /*Bson updates = Updates.combine(
                 Updates.set("lastLoginAt", new Date()));*/
@@ -62,7 +66,7 @@ public class UserService {
         System.out.println(decode.getBody().get("jti"));    // user id
         User user = userCollection.find(eq("_id", new ObjectId(id))).first();
         if(user == null) {
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(Constants.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
         System.out.printf("found user, id: %s, name: %s%n", user._id, user.name);
         return new ResponseEntity<>(user, HttpStatus.FOUND);
