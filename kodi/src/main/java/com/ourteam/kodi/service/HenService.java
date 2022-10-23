@@ -46,15 +46,23 @@ public class HenService {
             return new ResponseEntity<>(status.message, HttpStatus.FORBIDDEN);
         }
         String userId = status.data.getBody().get("jti").toString();
-        System.out.println(userId);
+        System.out.println("Found userId: "+userId);
         User user = userCollection.find(eq("_id", new ObjectId(userId))).first();
         if(user == null) {
             return new ResponseEntity<>(Constants.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
-        if(hen.owner == null) {
-            hen.owner = new Owner(user._id.toString(), user.phone, user.name, "");
-        }
+        // adding user info to hen
+        hen.owner = new Owner(user._id, user.phone, user.name, "");
         InsertOneResult result = henCollection.insertOne(hen);
+        if(result.getInsertedId() == null) {
+            return new ResponseEntity<>(Constants.SOME_PROBLEM, HttpStatus.NOT_FOUND);
+        }
+        // updating hen to user
+        if(user.myHens == null) {
+            user.myHens = new ArrayList<>();
+        }
+        user.myHens.add(result.getInsertedId().asObjectId().getValue());
+        userCollection.replaceOne(eq("_id", user.get_id()), user);
         return new ResponseEntity<>(result.getInsertedId(), HttpStatus.OK);
     }
 

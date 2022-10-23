@@ -1,11 +1,12 @@
 package com.ourteam.kodi.document;
 
 import lombok.Data;
+import org.bson.types.ObjectId;
 
 @Data
 public class Owner {
 	
-	public String id;
+	public ObjectId id;
     public String phoneNumber;
     public String name;
     public String dpUrl;
@@ -14,7 +15,7 @@ public class Owner {
 		super();		
 	}
 
-	public Owner(String id, String phoneNumber, String name, String dpUrl) {
+	public Owner(ObjectId id, String phoneNumber, String name, String dpUrl) {
 		this.id = id;
 		this.phoneNumber = phoneNumber;
 		this.name = name;

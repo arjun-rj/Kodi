@@ -12,7 +12,7 @@ public class User {
     public String name;
     public String phone;
     public Location location;
-    public ArrayList<String> myHens;
+    public ArrayList<ObjectId> myHens;
     public Date signedUpAt;
     public Date lastModifiedAt;
     public Date lastLoginAt;
