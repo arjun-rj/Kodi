@@ -7,7 +7,7 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.ourteam.kodi.document.Hen;
-import org.bson.Document;
+import com.ourteam.kodi.document.User;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,8 @@ public class RootService implements AutoCloseable{
 
 	MongoClient mongoClient;
 	MongoDatabase database;
-	public MongoCollection<Hen> henCollection;
+	MongoCollection<Hen> henCollection;
+	MongoCollection<User> userCollection;
 
 	public RootService() {
 		String uri = "mongodb+srv://admin:admin@sync.8nd5l.mongodb.net/test";
@@ -35,10 +36,15 @@ public class RootService implements AutoCloseable{
 		mongoClient = MongoClients.create(settings);
 		database = mongoClient.getDatabase("test");
 		henCollection = database.getCollection("hen", Hen.class);
+		userCollection = database.getCollection("user", User.class);
 	}
 
 	public MongoCollection<Hen> getHenCollection() {
 		return henCollection;
+	}
+
+	public MongoCollection<User> getUserCollection() {
+		return userCollection;
 	}
 
 	@Override

@@ -3,6 +3,8 @@ package com.ourteam.kodi.controller;
 import com.ourteam.kodi.document.Hen;
 import com.ourteam.kodi.service.HenService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController()
@@ -13,8 +15,9 @@ public class HenController {
     HenService henService;
 
     @PostMapping()
-    public Object addHen(@RequestBody Hen hen) {
-        return henService.addHen(hen);
+    public ResponseEntity<Object> addHen(@RequestBody Hen hen,
+                                         @RequestHeader(name = "token", required = true) String token) {
+        return henService.addHen(hen, token);
     }
 
     @PutMapping()
