@@ -38,9 +38,12 @@ public class UserService {
         user.setSignedUpAt(new Date());
         user.setLastModifiedAt(new Date());
         InsertOneResult result = userCollection.insertOne(user);
-        System.out.println("Created user: "+result.getInsertedId());
-        ReturnStatus<String> status = CommonUtils.generateUserToken(result.getInsertedId().toString(),
-                user.name, user.phone);
+        if(result.getInsertedId() == null) {
+            return new ResponseEntity<>(Constants.SOME_PROBLEM, HttpStatus.FORBIDDEN);
+        }
+        String userId = result.getInsertedId().asObjectId().getValue().toString();
+        System.out.println("Created user: "+userId);
+        ReturnStatus<String> status = CommonUtils.generateUserToken(userId, user.name, user.phone);
         return new ResponseEntity<>(status, HttpStatus.OK);
     }
 
@@ -52,6 +55,7 @@ public class UserService {
         /*Bson updates = Updates.combine(
                 Updates.set("lastLoginAt", new Date()));*/
         user.lastLoginAt = new Date();  // not working
+        System.out.println(user._id.toString());
         ReturnStatus<String> status = CommonUtils.generateUserToken(user._id.toString(), user.name, user.phone);
         return new ResponseEntity<>(status, HttpStatus.OK);
     }

@@ -5,11 +5,21 @@ import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.model.geojson.Point;
 import com.mongodb.client.model.geojson.Position;
+import com.mongodb.client.result.InsertOneResult;
+import com.ourteam.kodi.common.Constants;
+import com.ourteam.kodi.common.ReturnStatus;
 import com.ourteam.kodi.document.Hen;
+import com.ourteam.kodi.document.Owner;
+import com.ourteam.kodi.document.User;
+import com.ourteam.kodi.utils.CommonUtils;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,13 +33,29 @@ import static com.mongodb.client.model.Filters.near;
 public class HenService {
 
     MongoCollection<Hen> henCollection;
+    MongoCollection<User> userCollection;
 
     public HenService(RootService rootService) {
         henCollection = rootService.getHenCollection();
+        userCollection = rootService.getUserCollection();
     }
 
-    public Object addHen(Hen hen) {
-        return henCollection.insertOne(hen);
+    public ResponseEntity<Object> addHen(Hen hen, String token) {
+        ReturnStatus<Jws<Claims>> status = CommonUtils.parseJwt(token);
+        if(!status.status) {
+            return new ResponseEntity<>(status.message, HttpStatus.FORBIDDEN);
+        }
+        String userId = status.data.getBody().get("jti").toString();
+        System.out.println(userId);
+        User user = userCollection.find(eq("_id", new ObjectId(userId))).first();
+        if(user == null) {
+            return new ResponseEntity<>(Constants.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+        if(hen.owner == null) {
+            hen.owner = new Owner(user._id.toString(), user.phone, user.name, "");
+        }
+        InsertOneResult result = henCollection.insertOne(hen);
+        return new ResponseEntity<>(result.getInsertedId(), HttpStatus.OK);
     }
 
     public Object updateHen(String id) {
